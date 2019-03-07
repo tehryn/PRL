@@ -30,3 +30,6 @@
 *.exe
 *.out
 *.app
+proj1/bks
+.ftpconfig
+tests
