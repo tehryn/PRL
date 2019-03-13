@@ -47,19 +47,9 @@ void merge( unsigned char * arr1, unsigned char * arr2, size_t size, unsigned ch
 void shellSort(unsigned char * array, size_t size);
 int expectedProcCount( size_t fileSize, int procCount );
 
-template<typename T1>
-void DEBUG_INLINE(T1 x) {
-    std::cerr << x;
-}
-
 template<typename T1, typename T2>
 void DEBUG_INLINE(T1 x, T2 y) {
     std::cerr << x << y;
-}
-
-template<typename T1>
-void DEBUG_LINE(T1 x) {
-    std::cerr << x << std::endl;
 }
 
 template<typename T1, typename T2>

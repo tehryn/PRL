@@ -16,12 +16,13 @@ do
     diff "tests/${num}.bks" "tests/${num}.out"
     if [ "$?" == "0" ]
     then
-        echo -e "${GREEN}[TEST $total] mpirun --prefix /usr/local/share/OpenMPI -np $procNum bks $num $file ${NC}"
+        echo -e "${GREEN}[TEST $total] mpirun --prefix /usr/local/share/OpenMPI -np $procNum bks $file ${NC}"
         ((ok++))
     else
-        echo -e "${RED}[TEST $total] mpirun --prefix /usr/local/share/OpenMPI -np $procNum bks $num $file ${NC}"
+        echo -e "${RED}[TEST $total] mpirun --prefix /usr/local/share/OpenMPI -np $procNum bks $file ${NC}"
     fi
     ((total++))
+    sleep 5
 done
 
 if [ "$ok" == "$total" ]

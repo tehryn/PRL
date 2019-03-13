@@ -10,4 +10,4 @@ clean:
 
 zip:
 	rm -f xmatej52.zip
-	zip xmatej52.zip bks.c bks.h xmatej52.pdf
+	zip xmatej52.zip bks.cpp bks.h xmatej52.pdf test.sh

@@ -21,7 +21,7 @@ int main( int argc, char **argv ) {
     
     // Only root process will read from file
     if ( procId == 0 ) {
-        if ( argc == 1 ) {
+        if ( argc == 2 ) {
             fileSize = getFileSize( argv[1] );
         }
         else {
@@ -89,22 +89,22 @@ int main( int argc, char **argv ) {
         }
         std::cout << std::endl;
         
-        /* TODO - delete */
-        double t1, t2; 
-        t1 = MPI_Wtime();
-        
-        // sending data to list processes
-        size_t dest = procCount - 1;
-        size_t start = 0;
-        for( size_t j = 0; j < listCount; j++ ) {
-            MPI_Send( bucketData + start, baseBucketSize, MPI_UNSIGNED_CHAR, dest-- , NUMBER_TAG, MPI_COMM_WORLD);
-            start += baseBucketSize;
-        }
-        
-        // reading data from node processes
+        // size of both arrays root will receive from nodes
         size_t readSize = bucketSize >> 1;
-        MPI_Recv( bucketData, readSize, MPI_UNSIGNED_CHAR, 1, NUMBER_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE );
-        MPI_Recv( bucketData + readSize, readSize, MPI_UNSIGNED_CHAR, 2, NUMBER_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE );
+
+        if ( fileSize > 2 ) {
+            // sending data to list processes
+            size_t dest = procCount - 1;
+            size_t start = 0;
+            for( size_t j = 0; j < listCount; j++ ) {
+                MPI_Send( bucketData + start, baseBucketSize, MPI_UNSIGNED_CHAR, dest-- , NUMBER_TAG, MPI_COMM_WORLD);
+                start += baseBucketSize;
+            }
+            
+            // reading data from node processes
+            MPI_Recv( bucketData, readSize, MPI_UNSIGNED_CHAR, 1, NUMBER_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE );
+            MPI_Recv( bucketData + readSize, readSize, MPI_UNSIGNED_CHAR, 2, NUMBER_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE );
+        }
         
         // allocating memory for sorted array
         unsigned char * sorted = nullptr;
@@ -115,12 +115,13 @@ int main( int argc, char **argv ) {
             MPI_Abort(MPI_COMM_WORLD, BAD_ALLOCK);
         }
         
-        // merging sorted arrays
-        merge(bucketData, bucketData + readSize, readSize, sorted);
-        
-        /* TODO - delete */
-        t2 = MPI_Wtime();
-        std::cerr << fileSize << ";" << t2 -t1 << std::endl;
+        if ( fileSize > 1 ) {
+            // merging sorted arrays
+            merge(bucketData, bucketData + readSize, readSize, sorted);
+        }
+        else {
+            sorted[0] = bucketData[0];
+        }
         
         // printing result to stdout
         for ( size_t i = 0; i < fileSize; i++ ) {
@@ -231,11 +232,11 @@ void shellSort(unsigned char * array, size_t size) {
 }
 
 int expectedProcCount( size_t fileSize, int procCount ) {
-    int logn = ( log2( fileSize ) + 0.5 );
+    int logn = ceil( log2( fileSize ) );
     int nextPower = 1;
     if ( logn > 1 ) {
         nextPower++;
-        fileSize--;
+        logn--;
         while ( logn >>= 1 ) {
             nextPower <<= 1;
         }
