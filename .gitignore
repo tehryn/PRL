@@ -31,5 +31,6 @@
 *.out
 *.app
 proj1/bks
+proj2/vuv
 .ftpconfig
 tests
