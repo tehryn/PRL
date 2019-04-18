@@ -4,4 +4,6 @@ clean:
 
 zip:
 	rm -f xmatej52.zip
-	zip xmatej52.zip vuv.cpp vuv.h doc/xmatej52.pdf test.sh
+	cp doc/xmatej52.pdf .
+	zip xmatej52.zip vuv.cpp vuv.h xmatej52.pdf test.sh
+	rm xmatej52.pdf
